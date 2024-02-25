@@ -1,102 +1,112 @@
-const promptBtn = document.querySelector('#prompt-btn');
-const gridContainer = document.querySelector('#container');
-const pickColorBtn = document.querySelector('#pick-color-btn');
-const colorPicker = document.querySelector('#color-picker');
-const eraseBtn = document.querySelector('#erase-btn')
-const randomColorBtn = document.querySelector('#random-color-btn');
+// CONTAINERS REFERENCES
+const gridContainer = document.querySelector('#grid-container');
+
+
+// BUTTON REFERENCE FROM DOM
+const colorBtn = document.querySelector('#color-picker');
+const randomBtn = document.querySelector('#random-btn');
+const eraseBtn = document.querySelector('#erase-btn');
+const resizeBtn = document.querySelector('#resize-btn');
 const clearBtn = document.querySelector('#clear-btn');
 
-
-let pickedColor;
-let pickColorMode = true;
+// TOGGLE VARIABLES
+let currentColor;
+let colorMode = true;
 let eraseMode = false;
 let isMouseDown = false;
 
-// DEFAULT GRID WILL BE 16X16 FOR FIRST TIME LOADING THE PAGE
+// THIS WILL LOAD AUTOMATICALY WHEN THE PAGE LOADS
 window.addEventListener('load', () => {
-    pickedColor = 'black'
-    changeGrid(16);
-});
-
-pickColorBtn.addEventListener('click', () => {
-    colorPicker.click();
-    pickColorMode = true;
-    eraseMode = false;
-    updateButtonStyle();
+    currentColor = 'black';
+    createGrid(16);
 })
 
-randomColorBtn.addEventListener('click', () => {
-    pickedColor = null;
-    pickColorMode = false;
+
+// EVENT LISTENERS FOR TOOLS-NAV BUTTONS
+colorBtn.addEventListener('input', (event) => {
+    currentColor = event.target.value;
+    colorMode = true;
     eraseMode = false;
-    updateButtonStyle();
+    colorBtn.style.borderTop = '1px solid white';
+    colorBtn.style.borderBottom = '1px solid white';
+    randomBtn.style.borderTop = 'none';
+    randomBtn.style.borderBottom = 'none';
+    eraseBtn.style.borderTop = 'none';
+    eraseBtn.style.borderBottom = 'none';
 })
 
-colorPicker.addEventListener('input', (event) => {
-    pickedColor = event.target.value;
+randomBtn.addEventListener('click', () => {
+    currentColor = null;
+    colorMode = false;
     eraseMode = false;
-    updateButtonStyle();
+    colorBtn.style.borderTop = 'none';
+    colorBtn.style.borderBottom = 'none';
+    randomBtn.style.borderTop = '1px solid white';
+    randomBtn.style.borderBottom = '1px solid white';
+    eraseBtn.style.borderTop = 'none';
+    eraseBtn.style.borderBottom = 'none';
 })
-
 
 eraseBtn.addEventListener('click', () => {
     eraseMode = !eraseMode;
-    updateButtonStyle();
-});
+    colorBtn.style.borderTop = 'none';
+    colorBtn.style.borderBottom = 'none';
+    randomBtn.style.borderTop = 'none';
+    randomBtn.style.borderBottom = 'none';
+    eraseBtn.style.borderTop = '1px solid white';
+    eraseBtn.style.borderBottom = '1px solid white';
+})
 
 clearBtn.addEventListener('click', () => {
-    const cells = gridContainer.querySelectorAll('.cell');
+    const cells = document.querySelectorAll('.cell');
+
     cells.forEach(cell => {
         cell.style.backgroundColor = '';
     })
-});
+})
 
-gridContainer.addEventListener('mousedown', () => {
-    isMouseDown = true;
-});
+resizeBtn.addEventListener('click', () => {
+    resizePropmt();
+})
 
-gridContainer.addEventListener('mouseup', () => {
-    isMouseDown = false;
-});
 
-// Mouse over event listener to track when mouse moves over grid cells
+// THIS APPLIES A CLICK AND DRAG AND ENSURES ONLY THE CELLS WILL CHANGE COLOR
+gridContainer.addEventListener('mousedown', () => isMouseDown = true);
+gridContainer.addEventListener('mouseup', () => isMouseDown = false);
 gridContainer.addEventListener('mouseover', (event) => {
     if (isMouseDown && event.target.classList.contains('cell')) {
-        applyColorOrErase(event.target);
+        applyOrErase(event.target);
     }
-});
+})
 
 
-function changeGrid(size) {
 
+function createGrid(size) {
     gridContainer.innerHTML = '';
     gridContainer.style.setProperty('--grid-size', size);
 
-    for(let i = 0; i < size * size; i++) {
-        // EACH ITERATION WILL CREATE A NEW DIV (cell) AND APPEND IT TO THE gridContainer
-        const cell = document.createElement('div'); 
-        cell.classList.add('cell');
-        gridContainer.appendChild(cell);
-        cell.addEventListener('mouseup', () => {
-            applyColorOrErase(cell);
-        });
+    for (let i = 0; i < size * size; i++) {
+        const cellDiv = document.createElement('div');
+        cellDiv.classList.add('cell');
+        gridContainer.appendChild(cellDiv);
+        cellDiv.addEventListener('click', () => {
+            applyOrErase(cellDiv);
+        })
     }
-
 }
 
-function applyColorOrErase(cell) {
+function applyOrErase(cell) {
     if (eraseMode) {
         cell.style.backgroundColor = '';
     } else {
-        if(pickedColor) {
-            cell.style.backgroundColor = pickedColor;
+        if (currentColor) {
+            cell.style.backgroundColor = currentColor
         } else {
             cell.style.backgroundColor = generateRandomColor();
         }
     }
 }
 
-// GENERATES A RANDOM COLOR USING RGB FORMAT
 function generateRandomColor() {
     const red = Math.floor(Math.random() * 256);
     const green = Math.floor(Math.random() * 256);
@@ -105,44 +115,23 @@ function generateRandomColor() {
     return `rgb(${red}, ${green}, ${blue})`
 }
 
-function userPromptSize() {
-    let gridSize;
+function resizePropmt() {
+    let sizeInput;
 
     do {
-        gridSize = prompt('Enter grid size between 16 - 100: ');
-        
-        
-        // CANCEL THE FUNTION IF THERE WAS NO INPUT
-        if(gridSize === null) {
+        sizeInput = prompt('ENTER NUMBER OF CELLS IN GRID (16-100): ');
+
+        if (sizeInput === null) {
             return;
         }
 
-        // IF USER INPUT SOMETHING CONVERT IT TO A INTEGER
-        gridSize = parseInt(gridSize);
-    
-        // CHECK IF THE INPUT IS NOT A NUMBER, LESS THAN OR EQUAL TO 15 AND NOT EXCEEDING 100
-        if (isNaN(gridSize) || gridSize <= 15 || gridSize > 100) {
-            alert('INVALID INPUT. ENTER BETWEEN 16 - 100 ONLY.');
-        } 
+        sizeInput = parseInt(sizeInput);
 
-    } while (isNaN(gridSize) || gridSize <= 15 || gridSize > 100);
- 
+        if (isNaN(sizeInput) || sizeInput <= 15 || sizeInput > 100) {
+            alert("INVALID INPUT! PLEASE ENTER 16-100 ONLY.");
+        }
 
-    changeGrid(gridSize);
-        
+    } while (isNaN(sizeInput) || sizeInput <= 15 || sizeInput > 100)
+
+    createGrid(sizeInput);
 }
-
-function updateButtonStyle() {
-    eraseBtn.style.backgroundColor = eraseMode ? 'rgba(186, 112, 255, 0.8)' : 'rgba(186, 112, 255, 0.367)';
-    pickColorBtn.style.backgroundColor = pickColorMode ? 'rgba(186, 112, 255, 0.8)' : 'rgba(186, 112, 255, 0.367)';
-    randomColorBtn.style.backgroundColor = pickColorMode ? 'rgba(186, 112, 255, 0.367)' : 'rgba(186, 112, 255, 0.8)';
-}
-
-
-
-// RUN THE userPromptSize() WHEN CLICKED
-promptBtn.addEventListener('click', () => {
-    userPromptSize();
-})
-
-

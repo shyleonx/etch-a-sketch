@@ -3,27 +3,24 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Etch-A-Sketch</title>
+    <title>Etch A Sketch</title>
     <link rel="stylesheet" href="styles.css">
 </head>
 <body>
-
-    
     <div id="main-container">
-        <h1>ETCH - A - SKETCH</h1>
-        <div id="container"></div>
-
+        <h1>Etch A Sketch</h1>
+        <div id="sub-container">
+            <div id="grid-container"></div>
+            <div id="tools-nav">
+                <h2>TOOLS:</h2>
+                <input type="color" id="color-picker" class="button">
+                <button id="random-btn" class="button">RANDOM</button>
+                <button id="erase-btn" class="button">ERASE</button>
+                <button id="clear-btn" class="button">CLEAR</button>
+                <button id="resize-btn" class="button">RESIZE</button>
+            </div>
+        </div>
     </div>
-    <div id="btn-nav">
-        <h2>TOOLS: </h2>
-        <button id="pick-color-btn" class="button"><input type="color" id="color-picker"></button>
-        <button id="prompt-btn" class="button">Resize</button>
-        <button id="erase-btn" class="button">Eraser</button>
-        <button id="random-color-btn" class="button">Random</button>
-        <button id="clear-btn" class="button">Clear</button>
-    </div>
-
-    
 
     <script src="script.js"></script>
 </body>
